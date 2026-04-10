@@ -39,7 +39,7 @@ Because this project uses PHP and MySQL, you will need a local server environmen
 
 ### Step 1: Clone the Repository
 ```bash
-git clone [https://github.com/ShakibHossain124/The-Serene-Finder.git](https://github.com/ShakibHossain124/The-Serene-Finder.git)
+git clone https://github.com/ShakibHossain124/The-Serene-Finder.git
 ```
 *(Move the cloned folder into your local server's web directory, e.g., the `htdocs` folder in XAMPP).*
 
