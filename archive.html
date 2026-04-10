@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Archive - The Serene Finder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-brand" onclick="window.location.href='index.html'" style="cursor: pointer;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#2c636b"><path d="M12 2L2 22h20L12 2z"/></svg>
+            The Serene Finder
+        </div>
+
+        <ul class="dashboard-nav" id="sidebarNav">
+            <li class="active" onclick="window.location.href='dashboard.html'"><span>👤</span> Profile</li>
+            
+            <li onclick="window.location.href='archive.html'"><span>📅</span> Bookings</li>
+            
+            <li onclick="window.location.href='my_reviews.html'"><span>⭐</span> Reviews</li>
+            <li onclick="window.location.href='settings.html'"><span>⚙️</span> Settings</li>
+        </ul>
+
+        <div class="logout-btn" onclick="window.location.href='index.html'">
+            <span>🚪</span> Log out
+        </div>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dash-header">
+            <h1>Booking Archive</h1>
+            <p style="color: #8b9598;">Your complete history of service requests and job offers.</p>
+        </div>
+
+        <div class="bookings-grid" id="archiveGrid" style="margin-top: 30px;">
+            </div>
+    </main>
+
+    <script>
+        // Defeat BFCache so the archive is always fresh
+        window.addEventListener("pageshow", function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                // Fetch the exact same data the dashboard uses
+                const response = await fetch('api/get_dashboard_data.php');
+                const data = await response.json();
+
+                if (!data.loggedIn) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const grid = document.getElementById('archiveGrid');
+                let allHistory = [];
+
+                // Combine Outbound Bookings (Services I bought)
+                if (data.my_bookings) {
+                    data.my_bookings.forEach(b => {
+                        b.type = "Purchased Service";
+                        b.icon = "🔧";
+                        b.color = "#eef2f3";
+                        allHistory.push(b);
+                    });
+                }
+
+                // Combine Inbound Jobs (Services I provided)
+                if (data.job_offers) {
+                    data.job_offers.forEach(b => {
+                        b.type = "Job Offer";
+                        b.icon = "📋";
+                        b.color = "#ffebee";
+                        allHistory.push(b);
+                    });
+                }
+
+                // Sort everything by date (Newest first)
+                allHistory.sort((a, b) => new Date(b.scheduled_date) - new Date(a.scheduled_date));
+
+                if (allHistory.length === 0) {
+                    grid.innerHTML = `<p style="color: #8b9598;">No booking history found.</p>`;
+                    return;
+                }
+
+                // Generate the HTML for every single item in their history
+                let html = '';
+                allHistory.forEach(booking => {
+                    let statusClass = booking.status === 'confirmed' ? 'status-confirmed' : (booking.status === 'cancelled' ? 'status-cancelled' : 'status-pending');
+                    const dateString = new Date(booking.scheduled_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+                    html += `
+                        <div class="booking-item" style="opacity: ${booking.status === 'cancelled' ? '0.6' : '1'};">
+                            <div class="booking-item-header">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 40px; height: 40px; border-radius: 8px; background: ${booking.color}; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">${booking.icon}</div>
+                                    <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">${booking.type}</span>
+                                </div>
+                                <span class="b-status ${statusClass}">${booking.status.toUpperCase()}</span>
+                            </div>
+                            <h4 style="margin-top: 15px;">${booking.issue_description || 'General Service'}</h4>
+                            <p>Date: ${dateString}</p>
+                            ${booking.address ? `<div style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">📍 ${booking.address}</div>` : ''}
+                            <div class="booking-pro" style="margin-top: 15px;">
+                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #2c636b; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.6rem;">ID</div>
+                                <span>with ${booking.other_party}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                grid.innerHTML = html;
+
+            } catch (error) {
+                console.error("Failed to load archive data", error);
+                document.getElementById('archiveGrid').innerHTML = `<p style="color: red;">Error loading history.</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings - The Serene Finder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-page">
+
+    <aside class="sidebar">
+        <div class="sidebar-brand" onclick="window.location.href='index.html'" style="cursor: pointer;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#2c636b"><path d="M12 2L2 22h20L12 2z"/></svg>
+            The Serene Finder
+        </div>
+        
+        <ul class="dashboard-nav">
+            <li onclick="window.location.href='dashboard.html'"><span>🏠</span> Dashboard</li>
+            <li class="active"><span>⚙️</span> Settings</li>
+        </ul>
+        
+        <div style="margin-top: auto;">
+            <button class="logout-btn" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+        </div>
+    </aside>
+
+    <main class="dashboard-content">
+        <div class="dash-header">
+            <h1>Profile Settings</h1>
+            <p style="color: #8b9598;">Update your public profile and service rates.</p>
+        </div>
+
+        <div style="background: white; padding: 30px; border-radius: 16px; border: 1px solid #e1e8eb; max-width: 600px;">
+            <form id="settingsForm">
+                
+                <div class="form-row">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label>Professional Title</label>
+                        <input type="text" id="specialty" placeholder="e.g. Master Plumber" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label>Main Category</label>
+                        <select id="category" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px;" required>
+                            <option value="">Select a Category</option>
+                            <option value="HVAC">HVAC & Plumbing</option>
+                            <option value="Electri">Electrical</option>
+                            <option value="Clean">Cleaning & Care</option>
+                            <option value="Repair">General Repair</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label>Hourly Rate ($)</label>
+                        <input type="number" step="0.01" id="hourly_rate" placeholder="50.00" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label>Location</label>
+                        <input type="text" id="location" placeholder="e.g. London, UK" required>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label>Biography</label>
+                    <textarea id="bio" rows="5" placeholder="Tell clients about your experience and philosophy..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-block btn-book" id="saveBtn">Save Changes</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // 1. Load the existing data when the page opens
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const response = await fetch('api/get_settings.php');
+                const data = await response.json();
+
+                if (data.success && data.profile) {
+                    // Pre-fill the form inputs
+                    document.getElementById('specialty').value = data.profile.specialty || '';
+                    document.getElementById('category').value = data.profile.category || ''; // <-- ADDED THIS!
+                    document.getElementById('hourly_rate').value = data.profile.hourly_rate || '';
+                    document.getElementById('location').value = data.profile.location || '';
+                    document.getElementById('bio').value = data.profile.bio || '';
+                } else {
+                    alert("Please log in to view settings.");
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error("Error loading settings:", error);
+            }
+        });
+
+        // 2. Save the new data when the form is submitted
+        document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveBtn');
+            btn.innerText = "Saving...";
+
+            const updatedData = {
+                specialty: document.getElementById('specialty').value,
+                category: document.getElementById('category').value, // <-- ADDED THIS!
+                hourly_rate: document.getElementById('hourly_rate').value,
+                location: document.getElementById('location').value,
+                bio: document.getElementById('bio').value
+            };
+
+            try {
+                const response = await fetch('api/save_settings.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    btn.style.background = "#4caf50";
+                    btn.innerText = "✓ Saved Successfully!";
+                    setTimeout(() => {
+                        btn.style.background = "var(--primary-teal)";
+                        btn.innerText = "Save Changes";
+                    }, 2000);
+                } else {
+                    alert("Error saving: " + result.error);
+                    btn.innerText = "Save Changes";
+                }
+            } catch (error) {
+                alert("Server error.");
+                btn.innerText = "Save Changes";
+            }
+        });
+    </script>
+</body>
+</html>

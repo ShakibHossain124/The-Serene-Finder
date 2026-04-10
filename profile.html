@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Profile - The Serene Finder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-theme">
+
+    <header>
+        <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#2c636b"><path d="M12 2L2 22h20L12 2z"/></svg>
+            The Serene Finder
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html" style="text-decoration: none; color: inherit;">Home</a></li>
+                <li><a href="professionals.php" style="text-decoration: none; color: inherit;">Explore</a></li>
+                <li style="font-weight: 700;">Profile</li>
+            </ul>
+        </nav>
+        <div class="nav-actions">
+            <button onclick="window.location.href='login.html'" class="btn-primary" style="background: transparent; color: var(--bg-dark); border: 1px solid #ccc;">Sign In</button>
+        </div>
+    </header>
+
+    <div class="profile-layout">
+        <main>
+            <div class="profile-banner">
+                <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Professional Banner">
+                <div class="profile-banner-overlay">
+                    <span class="verified-tag" id="profile-specialty">✓ Verified Professional</span>
+                    <h1 id="profile-name">Loading...</h1>
+                    <div class="profile-stats">
+                        <span style="color: #ffd700;" id="profile-rating">★ 0.0</span>
+                        <span id="profile-reviews">(0 Reviews)</span>
+                        <span id="profile-location">📍 Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <section class="bio-section">
+                <h2>About <span id="bio-name">Loading...</span></h2>
+                <p id="profile-bio-text" style="color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">Loading biography...</p>
+                <div class="trust-badges">
+                    <div class="trust-badge-item">
+                        <span style="font-size: 1.5rem; color: var(--primary-teal);">🏅</span>
+                        <div>
+                            <h4>Master Technician</h4>
+                            <p>Accredited by the Guild of Professional Craftsmen</p>
+                        </div>
+                    </div>
+                    <div class="trust-badge-item">
+                        <span style="font-size: 1.5rem; color: var(--primary-teal);">🛡️</span>
+                        <div>
+                            <h4>Insured & Bonded</h4>
+                            <p>Comprehensive liability coverage for peace of mind</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="reviews-section">
+                <p style="color: var(--text-muted);">Loading reviews...</p>
+            </section>
+
+        </main>
+
+        <aside class="booking-sidebar">
+            <div class="booking-card">
+                <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 10px;">Standard Consultation</div>
+                <div class="booking-price" id="profile-rate">$0 <span>/ hour</span></div>
+                <div class="booking-input-group">
+                    <input type="date" placeholder="Select Appointment">
+                </div>
+                <div class="booking-input-group">
+                    <select>
+                        <option>Residential Repair</option>
+                        <option>Heritage Restoration</option>
+                        <option>Smart Home Integration</option>
+                    </select>
+                </div>
+                <button class="btn-block btn-book" id="bookNowBtn">🗓️ Book Now</button>
+                <button class="btn-block btn-contact" id="contact-btn">💬 Contact</button>
+                <div style="text-align: center; margin-top: 20px; font-size: 0.85rem; color: #4caf50; font-weight: 600;">
+                    • Available for emergency calls today
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // --- 1. GLOBAL AUTH CHECKER ---
+        async function runAuthCheck() {
+            try {
+                const response = await fetch('api/check_auth.php');
+                const auth = await response.json();
+                const navActions = document.querySelector('.nav-actions');
+                
+                if (auth.loggedIn && navActions) {
+                    navActions.innerHTML = `
+                        <button onclick="window.location.href='dashboard.html'" class="btn-primary" style="background: var(--primary-teal); color: white; border: none; margin-right: 10px;">Dashboard</button>
+                        <button id="globalLogoutBtn" class="btn-primary" style="background: transparent; color: var(--bg-dark); border: 1px solid #ccc;">Log Out</button>
+                    `;
+                    document.getElementById('globalLogoutBtn').addEventListener('click', async () => {
+                        await fetch('api/logout.php');
+                        window.location.reload(); 
+                    });
+                }
+            } catch (error) { console.error("Auth check failed", error); }
+        }
+        window.addEventListener("pageshow", (event) => { runAuthCheck(); });
+
+        // --- 2. LOAD PROFILE & REVIEWS ---
+        document.addEventListener("DOMContentLoaded", async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const providerId = urlParams.get('id');
+            const bookButton = document.getElementById('bookNowBtn');
+
+            if (!providerId) {
+                document.getElementById('profile-name').innerText = "Professional Not Found";
+                bookButton.disabled = true;
+                return;
+            }
+
+            try {
+                const response = await fetch(`api/get_profile.php?id=${providerId}`);
+                const provider = await response.json();
+
+                if (provider.error) {
+                    document.getElementById('profile-name').innerText = "Professional Not Found";
+                    bookButton.disabled = true;
+                    return;
+                }
+
+                const firstName = provider.full_name.split(' ')[0];
+                
+                // Inject Top Profile Data
+                document.getElementById('profile-name').innerText = provider.full_name;
+                document.getElementById('bio-name').innerText = firstName;
+                document.getElementById('profile-specialty').innerText = provider.specialty;
+                document.getElementById('profile-rating').innerText = `★ ${parseFloat(provider.rating || 0).toFixed(1)}`;
+                document.getElementById('profile-reviews').innerText = `(${provider.reviews_count || 0} Reviews)`;
+                document.getElementById('profile-rate').innerHTML = `$${provider.hourly_rate} <span>/ hour</span>`;
+                document.getElementById('profile-location').innerText = `📍 ${provider.location || 'Remote'}`;
+                document.getElementById('profile-bio-text').innerText = provider.bio || "This professional hasn't added a biography yet.";
+                document.getElementById('contact-btn').innerHTML = `💬 Contact ${firstName}`;
+
+                bookButton.onclick = function() {
+                    window.location.href = `booking.html?provider_id=${providerId}`;
+                };
+
+                // --- NEW: RENDER THE DYNAMIC REVIEWS ---
+                const reviewsContainer = document.querySelector('.reviews-section');
+                let reviewsHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2>Client Stories</h2>
+                    </div>
+                `;
+
+                if (provider.recent_reviews && provider.recent_reviews.length > 0) {
+                    provider.recent_reviews.forEach(review => {
+                        // Format the date
+                        const dateString = new Date(review.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        
+                        // Generate the Star string (e.g. 4 becomes ★★★★☆)
+                        const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                        const initial = review.reviewer_name.charAt(0).toUpperCase();
+
+                        reviewsHTML += `
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="reviewer-avatar" style="background: var(--primary-teal); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">${initial}</div>
+                                <div>
+                                    <div style="font-weight: 600;">${review.reviewer_name}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">${dateString}</div>
+                                </div>
+                                <div style="margin-left: auto; color: #ffd700; letter-spacing: 2px;">${stars}</div>
+                            </div>
+                            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">"${review.comment}"</p>
+                        </div>
+                        `;
+                    });
+                } else {
+                    reviewsHTML += `<p style="color: var(--text-muted);">No reviews yet. Be the first to book and leave a review!</p>`;
+                }
+                
+                reviewsContainer.innerHTML = reviewsHTML;
+
+            } catch (error) {
+                console.error("Error loading profile:", error);
+                document.getElementById('profile-name').innerText = "Error loading profile";
+            }
+        });
+    </script>
+</body>
+</html>

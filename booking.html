@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Booking - The Serene Finder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-theme">
+
+    <header>
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#2c636b"><path d="M12 2L2 22h20L12 2z"/></svg>
+            The Serene Finder
+        </div>
+        <nav>
+            <ul>
+                <li><a href="javascript:history.back()" style="text-decoration: none; color: inherit;">&larr; Back to Profile</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="profile-layout">
+        
+        <main>
+            <div class="booking-header">
+                <div class="secure-badge">🔒 Secure Booking</div>
+                <h1 id="booking-title">Schedule your service...</h1>
+                <p>Let's secure your spot. This professional is currently available for emergency repairs and standard maintenance visits in your area.</p>
+            </div>
+
+            <form id="bookingForm">
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <h3>Project Details</h3>
+                    </div>
+                    <div class="form-group">
+                        <label>Issue Description</label>
+                        <textarea id="issue" placeholder="Describe the issue in detail..."></textarea>
+                    </div>
+                </div>
+
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h3>Preferred Schedule</h3>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Select Date</label>
+                            <input type="date" id="date">
+                        </div>
+                        <div class="form-group">
+                            <label>Arrival Window</label>
+                            <select id="time">
+                                <option>Morning (8:00 AM - 12:00 PM)</option>
+                                <option>Afternoon (12:00 PM - 4:00 PM)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-section">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <h3>Service Address</h3>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Street Address</label>
+                        <input type="text" id="address" placeholder="123 Serenity Lane">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" id="city" placeholder="Portland">
+                        </div>
+                        <div class="form-group">
+                            <label>Zip Code</label>
+                            <input type="text" id="zip" placeholder="97201">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </main>
+
+        <aside class="booking-sidebar">
+            <div class="summary-card">
+                
+                <div class="summary-pro">
+                    <div style="width: 60px; height: 60px; border-radius: 12px; background: #eef2f3; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">👤</div>
+                    <div>
+                        <div style="font-size: 1.2rem; font-weight: 600;" id="summary-name">Loading...</div>
+                        <div class="pro-badge" id="summary-specialty">Loading...</div>
+                    </div>
+                </div>
+
+                <div class="summary-line">
+                    <span>Standard Service Call</span>
+                    <strong id="summary-rate">$0.00 / hr</strong>
+                </div>
+                <div class="summary-line">
+                    <span>Estimated Duration</span>
+                    <strong>2.0 Hours</strong>
+                </div>
+                <div class="summary-line">
+                    <span>Travel Convenience Fee</span>
+                    <strong>$25.00</strong>
+                </div>
+
+                <div class="summary-total">
+                    <div>
+                        <div class="summary-total-label">Total Estimate</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 5px;">*Final price determined<br>upon inspection</div>
+                    </div>
+                    <div class="summary-total-amount" id="summary-total">$0.00</div>
+                </div>
+
+                <button type="button" class="btn-block btn-book" onclick="submitBooking()">Confirm Booking &rarr;</button>
+                
+                <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 15px; line-height: 1.5;">
+                    By confirming, you agree to our Service Agreement and 24-hour cancellation policy.
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <div style="flex: 1; background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">
+                    🛡️ Fully Insured & Licensed
+                </div>
+                <div style="flex: 1; background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">
+                    ✨ Vetted Expert Professionals
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <script>
+        // --- 1. SCRIPT TO LOAD THE DATA WHEN PAGE OPENS ---
+        document.addEventListener("DOMContentLoaded", async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const providerId = urlParams.get('provider_id');
+
+            if (providerId) {
+                try {
+                    const response = await fetch(`api/get_profile.php?id=${providerId}`);
+                    const provider = await response.json();
+
+                    if (!provider.error) {
+                        // Inject the data into the HTML IDs we added above
+                        document.getElementById('booking-title').innerText = `Schedule your service with ${provider.full_name}`;
+                        document.getElementById('summary-name').innerText = provider.full_name;
+                        document.getElementById('summary-specialty').innerText = provider.specialty;
+                        document.getElementById('summary-rate').innerText = `$${provider.hourly_rate} / hr`;
+                        
+                        // Calculate the fake total estimate (Rate * 2 hours + $25 fee)
+                        const estimate = (parseFloat(provider.hourly_rate) * 2) + 25;
+                        document.getElementById('summary-total').innerText = `$${estimate.toFixed(2)}`;
+                    }
+                } catch (error) {
+                    console.error("Error loading provider details.", error);
+                }
+            }
+        });
+
+        // --- 2. SCRIPT TO SAVE THE DATA WHEN SUBMITTED ---
+        async function submitBooking() {
+            const btn = document.querySelector('.btn-book');
+            
+            // Read the provider_id directly out of the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const dynamicProviderId = urlParams.get('provider_id');
+
+            if (!dynamicProviderId) {
+                alert("Error: No professional selected to book.");
+                return;
+            }
+
+            btn.innerText = "Processing...";
+            
+            const bookingData = {
+                provider_id: dynamicProviderId, 
+                issue_description: document.getElementById('issue').value,
+                date: document.getElementById('date').value,
+                time_window: document.getElementById('time').value,
+                address: document.getElementById('address').value,
+                city: document.getElementById('city').value,
+                zip: document.getElementById('zip').value
+            };
+
+            try {
+                const response = await fetch('api/submit_booking.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookingData)
+                });
+                
+                const result = await response.json();
+                
+                if(result.success) {
+                    btn.style.background = "#4caf50";
+                    btn.innerText = "✓ Booking Confirmed!";
+                    setTimeout(() => window.location.href = 'dashboard.html', 1500);
+                } else {
+                    alert("Booking failed: " + result.error);
+                    btn.innerText = "Confirm Booking →";
+                }
+            } catch (error) {
+                alert("Error connecting to the server.");
+                btn.innerText = "Confirm Booking →";
+            }
+        }
+    </script>
+</body>
+</html>

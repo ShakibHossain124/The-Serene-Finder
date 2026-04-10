@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Reviews - The Serene Finder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-brand" onclick="window.location.href='index.html'" style="cursor: pointer;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#2c636b"><path d="M12 2L2 22h20L12 2z"/></svg>
+            The Serene Finder
+        </div>
+
+        <ul class="dashboard-nav" id="sidebarNav">
+            <li class="active" onclick="window.location.href='dashboard.html'"><span>👤</span> Profile</li>
+            
+            <li onclick="window.location.href='archive.html'"><span>📅</span> Bookings</li>
+            
+            <li onclick="window.location.href='my_reviews.html'"><span>⭐</span> Reviews</li>
+            <li onclick="window.location.href='settings.html'"><span>⚙️</span> Settings</li>
+        </ul>
+
+        <div class="logout-btn" onclick="window.location.href='index.html'">
+            <span>🚪</span> Log out
+        </div>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dash-header">
+            <h1 id="review-page-title">My Reviews</h1>
+            <p style="color: #8b9598;">Your feedback history on The Serene Finder.</p>
+        </div>
+
+        <div id="reviewsGrid" style="max-width: 800px; margin-top: 30px;">
+            </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const response = await fetch('api/get_my_reviews.php');
+                const data = await response.json();
+
+                if (!data.loggedIn) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const grid = document.getElementById('reviewsGrid');
+                
+                document.getElementById('review-page-title').innerText = data.role === 'provider' ? 'Reviews Received' : 'Reviews Given';
+
+                if (data.reviews && data.reviews.length > 0) {
+                    let html = '';
+                    data.reviews.forEach(review => {
+                        const dateString = new Date(review.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                        const label = data.role === 'provider' ? `From Customer: ${review.other_name}` : `For Professional: ${review.other_name}`;
+
+                        html += `
+                        <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e1e8eb; margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <div style="font-weight: 600; color: var(--primary-teal);">${label}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted);">${dateString}</div>
+                            </div>
+                            <div style="color: #ffd700; letter-spacing: 2px; font-size: 1.2rem; margin-bottom: 15px;">${stars}</div>
+                            <p style="color: var(--bg-dark); line-height: 1.6; margin: 0;">"${review.comment}"</p>
+                        </div>
+                        `;
+                    });
+                    grid.innerHTML = html;
+                } else {
+                    grid.innerHTML = `<p style="color: #8b9598;">No reviews found.</p>`;
+                }
+
+            } catch (error) {
+                console.error("Failed to load reviews", error);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - The Serene Finder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+
+    <div class="auth-visual" style="background-image: linear-gradient(135deg, #437d87, #26545c);">
+        <div class="auth-glass-card" style="background: transparent; box-shadow: none; padding: 0;">
+            <h2 style="color: white;">Find your sanctuary in the city.</h2>
+            <p style="color: rgba(255,255,255,0.8);">Connect with trusted professionals who bring serenity to your home maintenance and lifestyle needs.</p>
+        </div>
+    </div>
+
+    <div class="auth-form-side">
+        <div class="auth-form-wrapper">
+            <div style="font-weight: 700; color: var(--primary-teal); margin-bottom: 40px; display: flex; align-items: center; gap: 8px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#2c636b"><path d="M12 2L2 22h20L12 2z"/></svg>
+                Serene Finder
+            </div>
+
+            <h1>Welcome back</h1>
+            <p>Log in to manage your curated services.</p>
+
+            <form id="loginForm">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Email Address</label>
+                    <input type="email" id="email" placeholder="name@example.com" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <label>Password</label>
+                        <a href="#" style="font-size: 0.8rem; color: var(--primary-teal); text-decoration: none; font-weight: 600;">Forgot Password?</a>
+                    </div>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn-block btn-book" id="loginBtn">Sign In</button>
+            </form>
+
+            <div class="auth-divider">OR CONTINUE WITH</div>
+
+            <div class="social-btns">
+                <button class="btn-social">
+                    <span style="color: #DB4437;">G</span> Google
+                </button>
+                <button class="btn-social">
+                    <span>🍎</span> Apple
+                </button>
+            </div>
+
+            <p style="text-align: center; margin-top: 30px; font-size: 0.9rem;">
+                Don't have an account? <a href="signup.html" style="color: var(--primary-teal); font-weight: 600; text-decoration: none;">Join our sanctuary</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            btn.innerText = "Verifying...";
+
+            const loginData = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const response = await fetch('api/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData)
+                });
+                
+                const result = await response.json();
+                if(result.success) {
+                    btn.style.background = "#4caf50";
+                    btn.innerText = "✓ Success!";
+                    setTimeout(() => window.location.href = 'dashboard.html', 800);
+                } else {
+                    alert(result.error);
+                    btn.innerText = "Sign In";
+                }
+            } catch (error) {
+                alert("Server error.");
+                btn.innerText = "Sign In";
+            }
+        });
+    </script>
+</body>
+</html>

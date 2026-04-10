@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - The Serene Finder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+
+    <div class="auth-visual">
+        <div class="auth-glass-card">
+            <h2>Find tranquility in every service.</h2>
+            <p>Join our curated community of service professionals and homeowners dedicated to quality and peace of mind.</p>
+        </div>
+    </div>
+
+    <div class="auth-form-side">
+        <div class="auth-form-wrapper">
+            <h1>Get Started</h1>
+            <p>Create your curated sanctuary account today.</p>
+
+            <div class="role-toggle">
+                <button class="active" id="btnCustomer" onclick="setRole('customer')">Customer</button>
+                <button id="btnProvider" onclick="setRole('provider')">Service Provider</button>
+            </div>
+
+            <form id="signupForm">
+                <input type="hidden" id="selectedRole" value="customer">
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Full Name</label>
+                    <input type="text" id="fullName" placeholder="Evelyn Harper" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Email Address</label>
+                    <input type="email" id="email" placeholder="evelyn@example.com" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm</label>
+                        <input type="password" id="confirmPassword" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <label class="terms-checkbox">
+                    <input type="checkbox" required>
+                    <span>I agree to the <a href="#" style="color: var(--primary-teal);">Terms of Service</a> and <a href="#" style="color: var(--primary-teal);">Privacy Policy</a>.</span>
+                </label>
+
+                <button type="submit" class="btn-block btn-book" id="submitBtn">Create Account</button>
+            </form>
+
+            <div class="auth-divider">Or continue with</div>
+
+            <div class="social-btns">
+                <button class="btn-social">
+                    <span style="color: #DB4437;">G</span> Google
+                </button>
+                <button class="btn-social">
+                    <span style="color: #4267B2;">f</span> Facebook
+                </button>
+            </div>
+
+            <p style="text-align: center; margin-top: 30px; font-size: 0.9rem;">
+                Already have an account? <a href="login.html" style="color: var(--primary-teal); font-weight: 600; text-decoration: none;">Log in</a>
+            </p>
+
+        </div>
+    </div>
+
+    <script>
+        // Toggle Logic
+        function setRole(role) {
+            document.getElementById('selectedRole').value = role;
+            document.getElementById('btnCustomer').classList.remove('active');
+            document.getElementById('btnProvider').classList.remove('active');
+            
+            if(role === 'customer') {
+                document.getElementById('btnCustomer').classList.add('active');
+            } else {
+                document.getElementById('btnProvider').classList.add('active');
+            }
+        }
+
+        // Form Submission Logic
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent page reload
+            
+            const btn = document.getElementById('submitBtn');
+            const pass = document.getElementById('password').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+
+            if(pass !== confirmPass) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            btn.innerText = "Creating...";
+
+            const userData = {
+                full_name: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                password: pass,
+                role: document.getElementById('selectedRole').value
+            };
+
+            try {
+                const response = await fetch('api/register.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                
+                const result = await response.json();
+                if(result.success) {
+                    btn.style.background = "#4caf50";
+                    btn.innerText = "✓ Success!";
+                    // Redirect to dashboard after a brief pause
+                    setTimeout(() => window.location.href = 'dashboard.html', 1000);
+                } else {
+                    alert(result.error);
+                    btn.innerText = "Create Account";
+                }
+            } catch (error) {
+                alert("Error connecting to server.");
+                btn.innerText = "Create Account";
+            }
+        });
+    </script>
+</body>
+</html>
