@@ -9,10 +9,10 @@
 <body class="dashboard-body">
 
     <aside class="dashboard-sidebar">
-        <div class="sidebar-brand" onclick="window.location.href='index.html'" style="cursor: pointer;">
+        <a href="index.html" class="sidebar-brand" style="cursor: pointer; text-decoration: none; color: inherit;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="#2c636b"><path d="M12 2L2 22h20L12 2z"/></svg>
             The Serene Finder
-        </div>
+        </a>
 
         <div class="user-snippet">
             <div class="user-info">
@@ -22,15 +22,15 @@
         </div>
 
         <ul class="dashboard-nav" id="sidebarNav">
-            <li class="active" onclick="window.location.href='dashboard.html'"><span>👤</span> Profile</li>
+            <li class="active"><a href="dashboard.html" style="display: block; text-decoration: none; color: inherit;"><span>👤</span> Profile</a></li>
             
-            <li onclick="window.location.href='archive.html'"><span>📅</span> Bookings</li>
+            <li><a href="archive.html" style="display: block; text-decoration: none; color: inherit;"><span>📅</span> Bookings</a></li>
             
-            <li onclick="window.location.href='my_reviews.html'"><span>⭐</span> Reviews</li>
-            <li onclick="window.location.href='settings.html'"><span>⚙️</span> Settings</li>
+            <li><a href="my_reviews.html" style="display: block; text-decoration: none; color: inherit;"><span>⭐</span> Reviews</a></li>
+            <li><a href="settings.html" style="display: block; text-decoration: none; color: inherit;"><span>⚙️</span> Settings</a></li>
         </ul>
 
-        <div class="logout-btn" onclick="window.location.href='index.html'">
+        <div class="logout-btn">
             <span>🚪</span> Log out
         </div>
     </aside>
@@ -58,6 +58,14 @@
                         <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">STATUS</div>
                         <div id="next-appt-status" style="font-size: 1.2rem; font-weight: 600;">--</div>
                     </div>
+                    <div>
+                        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">DURATION</div>
+                        <div id="next-appt-duration" style="font-size: 1.2rem; font-weight: 600;">--</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">COST</div>
+                        <div id="next-appt-cost" style="font-size: 1.2rem; font-weight: 600; color: #4caf50;">--</div>
+                    </div>
                 </div>
             </div>
 
@@ -69,7 +77,7 @@
                 <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;" id="account-health-desc">Loading profile data...</p>
                 
                 <div style="margin-top: auto;">
-                    <button class="btn-block" style="background: #eef2f3; color: var(--bg-dark); font-weight: 600; border: none; padding: 12px; border-radius: 8px; cursor: pointer;" onclick="window.location.href='settings.html'">Manage Account</button>
+                    <a href="settings.html" class="btn-block" style="display: block; text-align: center; background: #eef2f3; color: var(--bg-dark); text-decoration: none; font-weight: 600; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">Manage Account</a>
                 </div>
             </div>
         </div>
@@ -86,7 +94,7 @@
                 <div style="color: var(--primary-teal); font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;">CURATED FOR YOU</div>
                 <h2>Elevate your living space with Autumn care services.</h2>
                 <p>We've identified 3 essential services for your home this season based on your previous preferences.</p>
-                <button style="background: #00bfa5; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; margin-right: 10px; cursor: pointer;" onclick="window.location.href='professionals.php'">Explore Recommendations</button>
+                <a href="professionals.php" style="display: inline-block; background: #00bfa5; color: white; text-decoration: none; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; margin-right: 10px; cursor: pointer;">Explore Recommendations</a>
                 <button style="background: transparent; color: white; border: 1px solid #333; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;" onclick="document.querySelector('.curated-box').style.display='none'">Dismiss</button>
             </div>
             
@@ -162,27 +170,43 @@
 
                 // --- 1. POPULATE TOP WIDGETS ---
                 let allAppointments = [];
-                if (data.my_bookings) allAppointments = allAppointments.concat(data.my_bookings);
-                if (data.job_offers) allAppointments = allAppointments.concat(data.job_offers);
+                if (data.my_bookings) {
+                    data.my_bookings.forEach(b => allAppointments.push({ ...b, appointmentType: 'booking' }));
+                }
+                if (data.job_offers) {
+                    data.job_offers.forEach(b => allAppointments.push({ ...b, appointmentType: 'offer' }));
+                }
 
-                // Filter out cancelled jobs to get accurate count
-                let activeAppointments = allAppointments.filter(b => b.status !== 'cancelled');
+                const now = new Date();
+                const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                // Only keep upcoming pending/confirmed appointments.
+                let upcomingAppointments = allAppointments.filter(b => {
+                    const status = (b.status || '').toLowerCase();
+                    if (status === 'cancelled' || status === 'completed') {
+                        return false;
+                    }
+
+                    const apptDate = new Date(b.scheduled_date);
+                    if (isNaN(apptDate)) {
+                        return false;
+                    }
+
+                    return apptDate >= startOfToday;
+                });
 
                 // Update the Subtitle count
-                document.getElementById('dash-subtitle').innerText = `Your sanctuary is curated and ready. You have ${activeAppointments.length} appointment(s) scheduled.`;
+                document.getElementById('dash-subtitle').innerText = `Your sanctuary is curated and ready. You have ${upcomingAppointments.length} upcoming appointment(s).`;
 
-                // Find the NEXT appointment by sorting the dates
-                if (activeAppointments.length > 0) {
-                    activeAppointments.sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date));
-                    const next = activeAppointments[0]; // The closest one!
+                // Find the NEXT upcoming appointment by sorting the dates
+                if (upcomingAppointments.length > 0) {
+                    upcomingAppointments.sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date));
+                    const next = upcomingAppointments[0];
                     
                     document.getElementById('next-appt-title').innerText = next.issue_description || 'General Service';
                     
-                    // Determine if the "other party" is a Provider or a Customer based on the role
-                    let partyRole = "Provider";
-                    if (data.user.role === 'provider' && data.job_offers && data.job_offers.some(job => job.id === next.id)) {
-                        partyRole = "Customer";
-                    }
+                    // Determine if the "other party" is a Provider or a Customer based on appointment type
+                    let partyRole = next.appointmentType === 'offer' ? "Customer" : "Provider";
                     document.getElementById('next-appt-pro').innerText = `with ${partyRole}: ${next.other_party}`;
                     
                     // Format Date
@@ -192,6 +216,12 @@
                     // Format Status
                     document.getElementById('next-appt-status').innerText = next.status.toUpperCase();
                     document.getElementById('next-appt-status').style.color = next.status === 'confirmed' ? '#4caf50' : '#ffeb3b';
+                    
+                    // Format Duration
+                    document.getElementById('next-appt-duration').innerText = next.estimated_time ? `${next.estimated_time} hrs` : '--';
+                    
+                    // Format Cost
+                    document.getElementById('next-appt-cost').innerText = next.total_price ? `$${parseFloat(next.total_price).toFixed(2)}` : '--';
                 } else {
                     // Empty State if they have no bookings
                     document.getElementById('next-appt-title').innerText = "No Upcoming Appointments";
@@ -223,6 +253,8 @@
                     data.my_bookings.forEach(booking => {
                         let statusClass = booking.status === 'confirmed' ? 'status-confirmed' : (booking.status === 'cancelled' ? 'status-cancelled' : 'status-pending');
                         const dateString = new Date(booking.scheduled_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        const timeDisplay = booking.estimated_time ? `${booking.estimated_time} Hours` : '--';
+                        const priceDisplay = booking.total_price ? `$${parseFloat(booking.total_price).toFixed(2)}` : '--';
 
                         outboundHTML += `
                             <div class="booking-item">
@@ -232,6 +264,10 @@
                                 </div>
                                 <h4>${booking.issue_description || 'General Service'}</h4>
                                 <p>Scheduled for ${dateString}</p>
+                                <div style="display: flex; gap: 20px; font-size: 0.85rem; margin-bottom: 10px; padding: 10px; background: #f5f7f8; border-radius: 6px;">
+                                    <div><span style="color: #666;">Duration:</span> <strong>${timeDisplay}</strong></div>
+                                    <div><span style="color: #666;">Estimated Cost:</span> <strong style="color: var(--primary-teal);">${priceDisplay}</strong></div>
+                                </div>
                                 <div class="booking-pro">
                                     <div style="width: 24px; height: 24px; border-radius: 50%; background: #2c636b; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.6rem;">PRO</div>
                                     <span>${booking.other_party}</span>
@@ -261,6 +297,8 @@
                     data.job_offers.forEach(booking => {
                         let statusClass = booking.status === 'confirmed' ? 'status-confirmed' : (booking.status === 'cancelled' ? 'status-cancelled' : 'status-pending');
                         const dateString = new Date(booking.scheduled_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        const timeDisplay = booking.estimated_time ? `${booking.estimated_time} Hours` : '--';
+                        const priceDisplay = booking.total_price ? `$${parseFloat(booking.total_price).toFixed(2)}` : '--';
 
                         inboundHTML += `
                             <div class="booking-item">
@@ -270,6 +308,10 @@
                                 </div>
                                 <h4>${booking.issue_description || 'Service Request'}</h4>
                                 <p>Date: ${dateString}</p>
+                                <div style="display: flex; gap: 20px; font-size: 0.85rem; margin-bottom: 10px; padding: 10px; background: #f5f7f8; border-radius: 6px;">
+                                    <div><span style="color: #666;">Duration:</span> <strong>${timeDisplay}</strong></div>
+                                    <div><span style="color: #666;">Payment:</span> <strong style="color: var(--primary-teal);">${priceDisplay}</strong></div>
+                                </div>
                                 <div style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">📍 ${booking.address || 'Address not provided'}</div>
                                 <div class="booking-pro">
                                     <div style="width: 24px; height: 24px; border-radius: 50%; background: #555; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.6rem;">CUST</div>

@@ -18,10 +18,16 @@ try {
 
     if ($role === 'provider') {
         // Providers see reviews written ABOUT them
-        $query = "SELECT r.*, u.full_name as other_name FROM reviews r JOIN users u ON r.customer_id = u.id WHERE r.provider_id = ? ORDER BY r.created_at DESC";
+        $query = "SELECT r.*, b.estimated_time, b.total_price, u.full_name as other_name FROM reviews r 
+                  JOIN users u ON r.customer_id = u.id 
+                  LEFT JOIN bookings b ON r.booking_id = b.id 
+                  WHERE r.provider_id = ? ORDER BY r.created_at DESC";
     } else {
         // Customers see reviews written BY them
-        $query = "SELECT r.*, u.full_name as other_name FROM reviews r JOIN users u ON r.provider_id = u.id WHERE r.customer_id = ? ORDER BY r.created_at DESC";
+        $query = "SELECT r.*, b.estimated_time, b.total_price, u.full_name as other_name FROM reviews r 
+                  JOIN users u ON r.provider_id = u.id 
+                  LEFT JOIN bookings b ON r.booking_id = b.id 
+                  WHERE r.customer_id = ? ORDER BY r.created_at DESC";
     }
 
     $stmt_revs = $pdo->prepare($query);

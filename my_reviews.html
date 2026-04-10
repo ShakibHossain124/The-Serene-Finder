@@ -9,21 +9,21 @@
 <body class="dashboard-body">
 
     <aside class="dashboard-sidebar">
-        <div class="sidebar-brand" onclick="window.location.href='index.html'" style="cursor: pointer;">
+        <a href="index.html" class="sidebar-brand" style="cursor: pointer; text-decoration: none; color: inherit;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="#2c636b"><path d="M12 2L2 22h20L12 2z"/></svg>
             The Serene Finder
-        </div>
+        </a>
 
         <ul class="dashboard-nav" id="sidebarNav">
-            <li class="active" onclick="window.location.href='dashboard.html'"><span>👤</span> Profile</li>
+            <li><a href="dashboard.html" style="display: block; text-decoration: none; color: inherit;"><span>👤</span> Profile</a></li>
             
-            <li onclick="window.location.href='archive.html'"><span>📅</span> Bookings</li>
+            <li><a href="archive.html" style="display: block; text-decoration: none; color: inherit;"><span>📅</span> Bookings</a></li>
             
-            <li onclick="window.location.href='my_reviews.html'"><span>⭐</span> Reviews</li>
-            <li onclick="window.location.href='settings.html'"><span>⚙️</span> Settings</li>
+            <li class="active"><a href="my_reviews.html" style="display: block; text-decoration: none; color: inherit;"><span>⭐</span> Reviews</a></li>
+            <li><a href="settings.html" style="display: block; text-decoration: none; color: inherit;"><span>⚙️</span> Settings</a></li>
         </ul>
 
-        <div class="logout-btn" onclick="window.location.href='index.html'">
+        <div class="logout-btn" id="reviewsLogoutBtn">
             <span>🚪</span> Log out
         </div>
     </aside>
@@ -40,6 +40,14 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
+            const logoutBtn = document.getElementById('reviewsLogoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async () => {
+                    await fetch('api/logout.php');
+                    window.location.href = 'index.html';
+                });
+            }
+
             try {
                 const response = await fetch('api/get_my_reviews.php');
                 const data = await response.json();
@@ -59,6 +67,8 @@
                         const dateString = new Date(review.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                         const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
                         const label = data.role === 'provider' ? `From Customer: ${review.other_name}` : `For Professional: ${review.other_name}`;
+                        const timeDisplay = review.estimated_time ? `${review.estimated_time} Hours` : '--';
+                        const priceDisplay = review.total_price ? `$${parseFloat(review.total_price).toFixed(2)}` : '--';
 
                         html += `
                         <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e1e8eb; margin-bottom: 20px;">
@@ -67,6 +77,10 @@
                                 <div style="font-size: 0.85rem; color: var(--text-muted);">${dateString}</div>
                             </div>
                             <div style="color: #ffd700; letter-spacing: 2px; font-size: 1.2rem; margin-bottom: 15px;">${stars}</div>
+                            <div style="display: flex; gap: 30px; font-size: 0.85rem; margin-bottom: 15px; padding: 10px; background: #f5f7f8; border-radius: 6px;">
+                                <div><span style="color: #666;">Work Duration:</span> <strong style="color: var(--primary-teal);">${timeDisplay}</strong></div>
+                                <div><span style="color: #666;">Amount:</span> <strong style="color: var(--primary-teal);">${priceDisplay}</strong></div>
+                            </div>
                             <p style="color: var(--bg-dark); line-height: 1.6; margin: 0;">"${review.comment}"</p>
                         </div>
                         `;

@@ -20,7 +20,7 @@
 <body class="light-theme">
 
     <header>
-        <a href="index.html" class="logo" style="text-decoration: none; color: inherit;">
+        <a href="index.html" class="logo" style="text-decoration: none; color: inherit; cursor: pointer;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="#2c636b"><path d="M12 2L2 22h20L12 2z"/></svg>
             The Serene Finder
         </a>
@@ -102,6 +102,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         document.getElementById('searchInput').value = urlParams.get('search') || '';
         document.getElementById('locationFilter').value = urlParams.get('location') || '';
+        document.getElementById('categoryFilter').value = urlParams.get('category') || '';
 
         // --- SEARCH ENGINE LOGIC ---
         async function loadProfessionals() {

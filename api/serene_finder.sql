@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 10, 2026 at 02:42 AM
+-- Generation Time: Apr 10, 2026 at 07:54 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -34,6 +34,8 @@ CREATE TABLE `bookings` (
   `issue_description` text DEFAULT NULL,
   `scheduled_date` datetime DEFAULT NULL,
   `address` varchar(255) DEFAULT NULL,
+  `estimated_time` decimal(5,2) DEFAULT NULL,
+  `total_price` decimal(10,2) DEFAULT NULL,
   `status` enum('pending','confirmed','completed','cancelled') DEFAULT 'pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -41,10 +43,15 @@ CREATE TABLE `bookings` (
 -- Dumping data for table `bookings`
 --
 
-INSERT INTO `bookings` (`id`, `customer_id`, `provider_id`, `issue_description`, `scheduled_date`, `address`, `status`) VALUES
-(1, 1, 3, 'need fixing ', '2026-04-10 00:00:00', '123 serene lake, dhaka 123', 'completed'),
-(2, 1, 3, '', '2026-04-11 00:00:00', '123 serene lake, dhaka 123', 'pending'),
-(3, 1, 4, 'need some fixing to do', '2026-04-12 00:00:00', '123 serene lake, dhaka 123', 'pending');
+INSERT INTO `bookings` (`id`, `customer_id`, `provider_id`, `issue_description`, `scheduled_date`, `address`, `estimated_time`, `total_price`, `status`) VALUES
+(1, 1, 3, 'need fixing ', '2026-04-10 00:00:00', '123 serene lake, dhaka 123', 1.00, 100.00, 'completed'),
+(2, 1, 3, '', '2026-04-11 00:00:00', '123 serene lake, dhaka 123', 1.00, 100.00, 'completed'),
+(3, 1, 4, 'need some fixing to do', '2026-04-12 00:00:00', '123 serene lake, dhaka 123', 1.00, 100.00, 'completed'),
+(4, 1, 3, 'fix', '2026-04-18 00:00:00', '123 serene lake, dhaka 123', 3.00, 175.00, 'confirmed'),
+(5, 2, 4, 'dfsfd', '2026-04-16 00:00:00', '123 serene lake, dhaka 123', 4.00, 145.00, 'confirmed'),
+(6, 2, 4, 'na', '2026-04-18 00:00:00', '123 serene lake, dhaka 123', 2.00, 85.00, 'confirmed'),
+(7, 2, 3, 'fg', '2026-04-21 00:00:00', '123 serene lake, dhaka 123', 4.00, 225.00, 'pending'),
+(8, 1, 4, '', '2026-04-10 00:00:00', '123 serene lake, dhaka 123', 5.00, 175.00, 'confirmed');
 
 -- --------------------------------------------------------
 
@@ -68,8 +75,8 @@ CREATE TABLE `provider_profiles` (
 --
 
 INSERT INTO `provider_profiles` (`user_id`, `specialty`, `category`, `hourly_rate`, `rating`, `reviews_count`, `bio`, `location`) VALUES
-(3, 'Electrician ', 'Electri', 50.00, 5.0, 1, 'An expert electrician', 'dhaka'),
-(4, 'plumber', 'HVAC', 30.00, 0.0, 0, 'An expert plumber', 'dhaka');
+(3, 'Electrician ', 'Electri', 50.00, 4.5, 2, 'An expert electrician', 'dhaka'),
+(4, 'plumber', 'HVAC', 30.00, 5.0, 1, 'An expert plumber', 'dhaka');
 
 -- --------------------------------------------------------
 
@@ -92,7 +99,9 @@ CREATE TABLE `reviews` (
 --
 
 INSERT INTO `reviews` (`id`, `booking_id`, `provider_id`, `customer_id`, `rating`, `comment`, `created_at`) VALUES
-(1, 1, 3, 1, 5, 'did a good job', '2026-04-10 00:35:26');
+(1, 1, 3, 1, 5, 'did a good job', '2026-04-10 00:35:26'),
+(2, 2, 3, 1, 4, 'ok', '2026-04-10 17:40:51'),
+(3, 3, 4, 1, 5, 'okey', '2026-04-10 17:48:06');
 
 -- --------------------------------------------------------
 
@@ -158,13 +167,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`

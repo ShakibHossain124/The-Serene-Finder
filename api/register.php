@@ -5,10 +5,16 @@ header('Content-Type: application/json');
 $data = json_decode(file_get_contents('php://input'), true);
 
 if ($data) {
-    $name = $data['full_name'];
-    $email = $data['email'];
-    $password = password_hash($data['password'], PASSWORD_DEFAULT); // Secure hashing
-    $role = $data['role']; // 'customer' or 'provider'
+    $name = trim($data['full_name'] ?? '');
+    $email = trim($data['email'] ?? '');
+    $raw_password = $data['password'] ?? '';
+    $password = password_hash($raw_password, PASSWORD_DEFAULT); // Secure hashing
+    $role = $data['role'] ?? ''; // 'customer' or 'provider'
+
+    if ($name === '' || $email === '' || $raw_password === '' || !in_array($role, ['customer', 'provider'], true)) {
+        echo json_encode(['success' => false, 'error' => 'Invalid registration data.']);
+        exit;
+    }
 
     try {
         // Check if email exists
@@ -24,9 +30,9 @@ if ($data) {
         $stmt->execute([$name, $email, $password, $role]);
         $new_user_id = $pdo->lastInsertId();
 
-        // If they are a provider, create an empty profile for them
+        // If they are a provider, create a placeholder profile aligned with current schema
         if ($role === 'provider') {
-            $stmt = $pdo->prepare("INSERT INTO provider_profiles (user_id, specialty, hourly_rate) VALUES (?, 'Pending Specialty', 0.00)");
+            $stmt = $pdo->prepare("INSERT INTO provider_profiles (user_id, specialty, hourly_rate, location) VALUES (?, 'Pending Specialty', 0.00, 'Pending Location')");
             $stmt->execute([$new_user_id]);
         }
 

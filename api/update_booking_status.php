@@ -14,11 +14,16 @@ $data = json_decode(file_get_contents('php://input'), true);
 if ($data) {
     try {
         $provider_id = $_SESSION['user_id']; 
-        $booking_id = $data['booking_id'];
-        $new_status = $data['status']; // 'confirmed' or 'cancelled'
+        $booking_id = (int)($data['booking_id'] ?? 0);
+        $new_status = $data['status'] ?? ''; // 'confirmed' or 'cancelled'
 
-        // 2. Update the status ONLY if this booking actually belongs to this provider!
-        $stmt = $pdo->prepare("UPDATE bookings SET status = ? WHERE id = ? AND provider_id = ?");
+        if ($booking_id <= 0 || !in_array($new_status, ['confirmed', 'cancelled'], true)) {
+            echo json_encode(['success' => false, 'error' => 'Invalid booking status request.']);
+            exit;
+        }
+
+        // 2. Update ONLY pending offers that belong to this provider
+        $stmt = $pdo->prepare("UPDATE bookings SET status = ? WHERE id = ? AND provider_id = ? AND status = 'pending'");
         $stmt->execute([$new_status, $booking_id, $provider_id]);
 
         // Check if a row was actually updated

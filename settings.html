@@ -134,10 +134,7 @@
             const btn = document.getElementById('saveBtn');
             btn.innerText = "Saving...";
 
-            const role = document.getElementById('providerFields').style.display === 'none' ? 'customer' : 'provider';
-
             const updatedData = {
-                role,
                 full_name: document.getElementById('full_name').value,
                 specialty: document.getElementById('specialty').value,
                 category: document.getElementById('category').value,

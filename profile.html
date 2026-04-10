@@ -9,10 +9,10 @@
 <body class="light-theme">
 
     <header>
-        <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+        <a href="index.html" class="logo" style="cursor: pointer; text-decoration: none; color: inherit;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="#2c636b"><path d="M12 2L2 22h20L12 2z"/></svg>
             The Serene Finder
-        </div>
+        </a>
         <nav>
             <ul>
                 <li><a href="index.html" style="text-decoration: none; color: inherit;">Home</a></li>
@@ -71,15 +71,8 @@
             <div class="booking-card">
                 <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 10px;">Standard Consultation</div>
                 <div class="booking-price" id="profile-rate">$0 <span>/ hour</span></div>
-                <div class="booking-input-group">
-                    <input type="date" placeholder="Select Appointment">
-                </div>
-                <div class="booking-input-group">
-                    <select>
-                        <option>Residential Repair</option>
-                        <option>Heritage Restoration</option>
-                        <option>Smart Home Integration</option>
-                    </select>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px;">
+                    Choose schedule and service details on the next booking step.
                 </div>
                 <button class="btn-block btn-book" id="bookNowBtn">🗓️ Book Now</button>
                 <button class="btn-block btn-contact" id="contact-btn">💬 Contact</button>
