@@ -9,10 +9,10 @@
 <body>
 
     <header>
-        <div class="logo">
+        <a href="index.html" class="logo" style="text-decoration: none; color: inherit;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="#2c636b"><path d="M12 2L2 22h20L12 2z"/></svg>
             The Serene Finder
-        </div>
+        </a>
         <nav>
             <ul>
                 <li>How it Works</li>
@@ -21,7 +21,7 @@
         </nav>
         <div class="nav-actions">
             <a href="login.html" style="color: inherit; text-decoration: none; font-weight: 500;">Sign In</a>
-            <button class="btn-primary" onclick="window.location.href='signup.html'">Join Now</button>
+            <a href="signup.html" class="btn-primary">Join Now</a>
         </div>
     </header>
 
@@ -31,9 +31,9 @@
             <p>Experience the calm of professional craftsmanship. We curate local experts so you can reclaim your sanctuary, one project at a time.</p>
             
             <div class="search-pill">
-                <input type="text" class="search-input" placeholder="🔍 What do you need help with today?">
-                <input type="text" class="location-input" placeholder="📍 San Francisco">
-                <button class="btn-primary" onclick="window.location.href='professionals.php'">Find Expert</button>
+                <input type="text" id="homeSearchInput" class="search-input" placeholder="🔍 who are you searching for?">
+                <input type="text" id="homeLocationInput" class="location-input" placeholder="📍 Dhaka">
+                <button id="findExpertBtn" class="btn-primary" type="button">Find Expert</button>
             </div>
         </div>
 
@@ -62,30 +62,30 @@
             </div>
 
             <div class="pillars-grid">
-                <div class="pillar-card" onclick="window.location.href='professionals.php'">
+                <a href="professionals.php" class="pillar-card" style="text-decoration: none; color: inherit;">
                     <div class="icon-wrapper">💧</div>
                     <span>Plumbing</span>
-                </div>
-                <div class="pillar-card" onclick="window.location.href='professionals.php'">
+                </a>
+                <a href="professionals.php" class="pillar-card" style="text-decoration: none; color: inherit;">
                     <div class="icon-wrapper">⚡</div>
                     <span>Electrical</span>
-                </div>
-                <div class="pillar-card" onclick="window.location.href='professionals.php'">
+                </a>
+                <a href="professionals.php" class="pillar-card" style="text-decoration: none; color: inherit;">
                     <div class="icon-wrapper">🌿</div>
                     <span>Gardening</span>
-                </div>
-                <div class="pillar-card" onclick="window.location.href='professionals.php'">
+                </a>
+                <a href="professionals.php" class="pillar-card" style="text-decoration: none; color: inherit;">
                     <div class="icon-wrapper">✨</div>
                     <span>Cleaning</span>
-                </div>
-                <div class="pillar-card" onclick="window.location.href='professionals.php'">
+                </a>
+                <a href="professionals.php" class="pillar-card" style="text-decoration: none; color: inherit;">
                     <div class="icon-wrapper">🎨</div>
                     <span>Painting</span>
-                </div>
-                <div class="pillar-card" onclick="window.location.href='professionals.php'">
+                </a>
+                <a href="professionals.php" class="pillar-card" style="text-decoration: none; color: inherit;">
                     <div class="icon-wrapper">🔨</div>
                     <span>Carpentry</span>
-                </div>
+                </a>
             </div>
         </section>
 
@@ -105,7 +105,7 @@
                 if (auth.loggedIn && navActions) {
                     // If logged in, swap the button HTML!
                     navActions.innerHTML = `
-                        <button onclick="window.location.href='dashboard.html'" class="btn-primary" style="background: var(--primary-teal); color: white; border: none; margin-right: 10px;">Dashboard</button>
+                        <a href="dashboard.html" class="btn-primary" style="background: var(--primary-teal); color: white; border: none; margin-right: 10px; text-decoration: none;">Dashboard</a>
                         <button id="globalLogoutBtn" class="btn-primary" style="background: transparent; color: var(--bg-dark); border: 1px solid #ccc;">Log Out</button>
                     `;
 
@@ -113,6 +113,29 @@
                     document.getElementById('globalLogoutBtn').addEventListener('click', async () => {
                         await fetch('api/logout.php');
                         window.location.reload(); // Refresh the page to show the "Sign In" button again
+                    });
+                }
+
+                const findExpertBtn = document.getElementById('findExpertBtn');
+                if (findExpertBtn) {
+                    const goToFilteredResults = () => {
+                        const searchValue = document.getElementById('homeSearchInput').value.trim();
+                        const locationValue = document.getElementById('homeLocationInput').value.trim();
+                        const params = new URLSearchParams();
+
+                        if (searchValue) params.set('search', searchValue);
+                        if (locationValue) params.set('location', locationValue);
+
+                        const query = params.toString();
+                        window.location.href = query ? `professionals.php?${query}` : 'professionals.php';
+                    };
+
+                    findExpertBtn.addEventListener('click', goToFilteredResults);
+                    document.getElementById('homeSearchInput').addEventListener('keyup', (e) => {
+                        if (e.key === 'Enter') goToFilteredResults();
+                    });
+                    document.getElementById('homeLocationInput').addEventListener('keyup', (e) => {
+                        if (e.key === 'Enter') goToFilteredResults();
                     });
                 }
             } catch (error) {

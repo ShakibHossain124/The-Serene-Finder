@@ -20,10 +20,10 @@
 <body class="light-theme">
 
     <header>
-        <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+        <a href="index.html" class="logo" style="text-decoration: none; color: inherit;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="#2c636b"><path d="M12 2L2 22h20L12 2z"/></svg>
             The Serene Finder
-        </div>
+        </a>
         <nav>
             <ul>
                 <li><a href="index.html" style="text-decoration: none; color: inherit;">Home</a></li>
@@ -31,7 +31,7 @@
             </ul>
         </nav>
         <div class="nav-actions">
-            <button onclick="window.location.href='login.html'" class="btn-primary" style="background: transparent; color: var(--bg-dark); border: 1px solid #ccc;">Sign In</button>
+            <a href="login.html" class="btn-primary" style="background: transparent; color: var(--bg-dark); border: 1px solid #ccc; text-decoration: none;">Sign In</a>
         </div>
     </header>
 
@@ -59,6 +59,11 @@
             </div>
 
             <div class="filter-group">
+                <label>Location</label>
+                <input type="text" id="locationFilter" placeholder="City or area...">
+            </div>
+
+            <div class="filter-group">
                 <label>Max Hourly Rate: <span id="priceLabel" style="color: var(--primary-teal);">$100</span></label>
                 <input type="range" id="priceFilter" min="10" max="200" step="5" value="100">
             </div>
@@ -81,7 +86,7 @@
                 
                 if (auth.loggedIn && navActions) {
                     navActions.innerHTML = `
-                        <button onclick="window.location.href='dashboard.html'" class="btn-primary" style="background: var(--primary-teal); color: white; border: none; margin-right: 10px;">Dashboard</button>
+                        <a href="dashboard.html" class="btn-primary" style="background: var(--primary-teal); color: white; border: none; margin-right: 10px; text-decoration: none;">Dashboard</a>
                         <button id="globalLogoutBtn" class="btn-primary" style="background: transparent; color: var(--bg-dark); border: 1px solid #ccc;">Log Out</button>
                     `;
                     document.getElementById('globalLogoutBtn').addEventListener('click', async () => {
@@ -94,6 +99,10 @@
         window.addEventListener("pageshow", runAuthCheck);
         document.addEventListener("DOMContentLoaded", runAuthCheck);
 
+        const urlParams = new URLSearchParams(window.location.search);
+        document.getElementById('searchInput').value = urlParams.get('search') || '';
+        document.getElementById('locationFilter').value = urlParams.get('location') || '';
+
         // --- SEARCH ENGINE LOGIC ---
         async function loadProfessionals() {
             const grid = document.getElementById('providersGrid');
@@ -102,13 +111,14 @@
             // Grab the values from the sidebar
             const search = document.getElementById('searchInput').value;
             const category = document.getElementById('categoryFilter').value;
+            const location = document.getElementById('locationFilter').value;
             const maxPrice = document.getElementById('priceFilter').value;
 
             // Update the visual price label
             document.getElementById('priceLabel').innerText = `$${maxPrice}`;
 
             // Build the dynamic URL
-            const url = `api/search_providers.php?search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}&max_price=${maxPrice}`;
+            const url = `api/search_providers.php?search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}&location=${encodeURIComponent(location)}&max_price=${maxPrice}`;
 
             try {
                 const response = await fetch(url);
@@ -167,11 +177,18 @@
             if (e.key === 'Enter') loadProfessionals();
         });
 
+        document.getElementById('locationFilter').addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') loadProfessionals();
+        });
+
         // Run search instantly when the slider is dragged
         document.getElementById('priceFilter').addEventListener('input', loadProfessionals);
         
         // Run search instantly when a category is picked
         document.getElementById('categoryFilter').addEventListener('change', loadProfessionals);
+
+        // Run search when location text changes
+        document.getElementById('locationFilter').addEventListener('change', loadProfessionals);
 
     </script>
 </body>
