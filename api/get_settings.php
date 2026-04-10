@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 try {
     // Fetch the user's current profile data
     $stmt = $pdo->prepare("
-        SELECT u.full_name, p.specialty, p.category, p.hourly_rate, p.bio, p.location 
+        SELECT u.full_name, u.email, u.role, p.specialty, p.category, p.hourly_rate, p.bio, p.location 
         FROM users u 
         LEFT JOIN provider_profiles p ON u.id = p.user_id 
         WHERE u.id = ?

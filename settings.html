@@ -19,19 +19,28 @@
             <li class="active"><span>⚙️</span> Settings</li>
         </ul>
         
-        <div style="margin-top: auto;">
-            <button class="logout-btn" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
-        </div>
     </aside>
 
     <main class="dashboard-content">
         <div class="dash-header">
             <h1>Profile Settings</h1>
-            <p style="color: #8b9598;">Update your public profile and service rates.</p>
+            <p id="settingsSubtitle" style="color: #8b9598;">Update your account details.</p>
         </div>
 
         <div style="background: white; padding: 30px; border-radius: 16px; border: 1px solid #e1e8eb; max-width: 600px;">
             <form id="settingsForm">
+                <div class="form-row">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label>Full Name</label>
+                        <input type="text" id="full_name" placeholder="Your full name" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label>Email</label>
+                        <input type="email" id="email" readonly style="background: #f5f7f8; color: #666;">
+                    </div>
+                </div>
+
+                <div id="providerFields">
                 
                 <div class="form-row">
                     <div class="form-group" style="margin-bottom: 20px;">
@@ -65,6 +74,13 @@
                     <label>Biography</label>
                     <textarea id="bio" rows="5" placeholder="Tell clients about your experience and philosophy..."></textarea>
                 </div>
+                </div>
+
+                <div id="customerFields" style="display: none; margin-bottom: 25px;">
+                    <div style="padding: 14px; border-radius: 10px; background: #eef2f3; color: #465055; font-size: 0.92rem;">
+                        You are signed in as a customer. You can update your account name here.
+                    </div>
+                </div>
 
                 <button type="submit" class="btn-block btn-book" id="saveBtn">Save Changes</button>
             </form>
@@ -79,12 +95,30 @@
                 const data = await response.json();
 
                 if (data.success && data.profile) {
+                    const isProvider = data.profile.role === 'provider';
+
                     // Pre-fill the form inputs
+                    document.getElementById('full_name').value = data.profile.full_name || '';
+                    document.getElementById('email').value = data.profile.email || '';
                     document.getElementById('specialty').value = data.profile.specialty || '';
-                    document.getElementById('category').value = data.profile.category || ''; // <-- ADDED THIS!
+                    document.getElementById('category').value = data.profile.category || '';
                     document.getElementById('hourly_rate').value = data.profile.hourly_rate || '';
                     document.getElementById('location').value = data.profile.location || '';
                     document.getElementById('bio').value = data.profile.bio || '';
+
+                    const providerFields = document.getElementById('providerFields');
+                    const customerFields = document.getElementById('customerFields');
+                    const subtitle = document.getElementById('settingsSubtitle');
+
+                    providerFields.style.display = isProvider ? 'block' : 'none';
+                    customerFields.style.display = isProvider ? 'none' : 'block';
+                    subtitle.innerText = isProvider
+                        ? 'Update your public profile and service rates.'
+                        : 'Update your account details.';
+
+                    ['specialty', 'category', 'hourly_rate', 'location'].forEach((id) => {
+                        document.getElementById(id).required = isProvider;
+                    });
                 } else {
                     alert("Please log in to view settings.");
                     window.location.href = 'login.html';
@@ -100,9 +134,13 @@
             const btn = document.getElementById('saveBtn');
             btn.innerText = "Saving...";
 
+            const role = document.getElementById('providerFields').style.display === 'none' ? 'customer' : 'provider';
+
             const updatedData = {
+                role,
+                full_name: document.getElementById('full_name').value,
                 specialty: document.getElementById('specialty').value,
-                category: document.getElementById('category').value, // <-- ADDED THIS!
+                category: document.getElementById('category').value,
                 hourly_rate: document.getElementById('hourly_rate').value,
                 location: document.getElementById('location').value,
                 bio: document.getElementById('bio').value
