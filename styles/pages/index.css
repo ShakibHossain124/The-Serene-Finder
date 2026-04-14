@@ -1,0 +1,254 @@
+@import url('../base.css');
+
+.hero {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 40px;
+	align-items: center;
+	padding: 60px 5%;
+	background-color: var(--bg-dark);
+}
+
+.hero-content h1 {
+	margin-bottom: 20px;
+	font-size: clamp(2rem, 6vw, 3.5rem);
+	font-weight: 600;
+	line-height: 1.1;
+}
+
+.hero-content h1 span {
+	color: var(--primary-teal);
+	font-style: italic;
+}
+
+.hero-content p {
+	max-width: 80%;
+	margin-bottom: 40px;
+	color: var(--text-muted);
+	font-size: 1.1rem;
+	line-height: 1.5;
+}
+
+.search-pill {
+	display: flex;
+	align-items: center;
+	max-width: 650px;
+	border-radius: 50px;
+	padding: 8px;
+	background: #fff;
+}
+
+.search-input {
+	flex: 1;
+	border: none;
+	outline: none;
+	padding: 15px 20px;
+	background: transparent;
+	color: var(--bg-dark);
+	font-size: 0.95rem;
+}
+
+.location-input {
+	border: none;
+	border-left: 1px solid #eee;
+	outline: none;
+	padding: 15px 20px;
+	background: transparent;
+	color: var(--bg-dark);
+	font-size: 0.95rem;
+}
+
+.search-pill .btn-primary {
+	padding: 12px 30px;
+}
+
+.hero-image-container {
+	position: relative;
+	overflow: hidden;
+	height: 600px;
+	border-radius: var(--border-radius);
+}
+
+.hero-image-container img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.trust-badge {
+	position: absolute;
+	bottom: 30px;
+	left: 30px;
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	border-radius: 50px;
+	padding: 15px 25px;
+	background: #fff;
+	color: var(--bg-dark);
+	font-size: 0.9rem;
+	font-weight: 600;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.light-section {
+	position: relative;
+	z-index: 10;
+	margin-top: -30px;
+	border-top-left-radius: 40px;
+	border-top-right-radius: 40px;
+	padding: 60px 5%;
+	background-color: var(--bg-offwhite);
+	color: var(--bg-dark);
+}
+
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+	margin-bottom: 40px;
+}
+
+.section-title h2 {
+	margin-bottom: 8px;
+	font-size: 1.8rem;
+	font-weight: 600;
+}
+
+.section-title p {
+	color: var(--text-muted);
+	font-size: 1rem;
+}
+
+.explore-link {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	color: var(--primary-teal);
+	text-decoration: none;
+	font-size: 0.95rem;
+	font-weight: 600;
+}
+
+.explore-link:hover {
+	text-decoration: underline;
+}
+
+.pillars-grid {
+	display: flex;
+	justify-content: space-between;
+	gap: 20px;
+	overflow-x: auto;
+	padding-bottom: 10px;
+}
+
+.pillar-card {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	align-items: center;
+	gap: 15px;
+	min-width: 140px;
+	border-radius: 16px;
+	padding: 30px 20px;
+	background: #fff;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+	cursor: pointer;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pillar-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.icon-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	background-color: #eaf1f2;
+	color: var(--primary-teal);
+	font-size: 1.5rem;
+}
+
+.pillar-card span {
+	color: var(--bg-dark);
+	font-size: 0.95rem;
+	font-weight: 600;
+}
+
+@media (max-width: 980px) {
+	.hero {
+		grid-template-columns: 1fr;
+		padding: 42px 18px 30px;
+	}
+
+	.hero-content p {
+		max-width: 100%;
+	}
+
+	.hero-image-container {
+		height: 420px;
+	}
+
+	.light-section {
+		margin-top: 0;
+		border-top-left-radius: 26px;
+		border-top-right-radius: 26px;
+		padding: 40px 18px;
+	}
+
+	.section-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+	}
+}
+
+@media (max-width: 760px) {
+	.hero-image-container {
+		height: 320px;
+	}
+
+	.trust-badge {
+		left: 14px;
+		right: 14px;
+		bottom: 14px;
+		padding: 10px 14px;
+		border-radius: 14px;
+		font-size: 0.8rem;
+	}
+
+	.search-pill {
+		flex-direction: column;
+		align-items: stretch;
+		max-width: 100%;
+		border-radius: 16px;
+	}
+
+	.search-input,
+	.location-input {
+		padding: 13px 14px;
+	}
+
+	.location-input {
+		border-left: none;
+		border-top: 1px solid #eee;
+	}
+
+	.search-pill .btn-primary {
+		width: 100%;
+	}
+
+	.pillars-grid {
+		gap: 12px;
+	}
+
+	.pillar-card {
+		min-width: 140px;
+		padding: 22px 12px;
+	}
+}

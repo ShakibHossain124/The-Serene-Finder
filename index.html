@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Serene Finder</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/pages/index.css">
 </head>
 <body>
 
@@ -111,7 +111,7 @@
 
                     // Wire up the new Log Out button
                     document.getElementById('globalLogoutBtn').addEventListener('click', async () => {
-                        await fetch('api/logout.php');
+                        await fetch('api/logout.php', { method: 'POST' });
                         window.location.reload(); // Refresh the page to show the "Sign In" button again
                     });
                 }

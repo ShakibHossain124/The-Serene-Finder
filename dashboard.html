@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - The Serene Finder</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/pages/dashboard.css">
 </head>
 <body class="dashboard-body">
 
@@ -42,14 +42,14 @@
             <p id="dash-subtitle" style="color: #8b9598;">Loading your schedule...</p>
         </div>
 
-        <div style="display: flex; gap: 20px; margin-bottom: 40px; flex-wrap: wrap;">
+        <div class="top-cards" style="display: flex; gap: 20px; margin-bottom: 40px; flex-wrap: wrap;">
             
-            <div style="flex: 2; min-width: 300px; background: linear-gradient(135deg, #1a2a2d, #2c636b); padding: 30px; border-radius: 16px; color: white; position: relative; overflow: hidden;">
+            <div class="next-appointment-card" style="flex: 2; min-width: 300px; background: linear-gradient(135deg, #1a2a2d, #2c636b); padding: 30px; border-radius: 16px; color: white; position: relative; overflow: hidden;">
                 <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; background: rgba(255,255,255,0.2); display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 15px;">Next Appointment</div>
                 <h2 id="next-appt-title" style="margin: 0 0 5px 0; font-size: 1.8rem;">Searching schedule...</h2>
                 <p id="next-appt-pro" style="color: rgba(255,255,255,0.8); margin-bottom: 25px;">...</p>
                 
-                <div style="display: flex; gap: 40px;">
+                <div class="next-appointment-stats" style="display: flex; gap: 40px;">
                     <div>
                         <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">DATE</div>
                         <div id="next-appt-date" style="font-size: 1.2rem; font-weight: 600;">--</div>
@@ -69,7 +69,7 @@
                 </div>
             </div>
 
-            <div style="flex: 1; min-width: 250px; background: white; padding: 30px; border-radius: 16px; border: 1px solid #e1e8eb; display: flex; flex-direction: column;">
+            <div class="account-status-card" style="flex: 1; min-width: 250px; background: white; padding: 30px; border-radius: 16px; border: 1px solid #e1e8eb; display: flex; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                     <h3 style="margin: 0; font-size: 1.1rem; color: var(--bg-dark);">Account Status</h3>
                     <span style="color: var(--primary-teal); font-weight: 600;" id="account-role-badge">Member</span>
@@ -94,7 +94,7 @@
                 <div style="color: var(--primary-teal); font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;">CURATED FOR YOU</div>
                 <h2>Elevate your living space with Autumn care services.</h2>
                 <p>We've identified 3 essential services for your home this season based on your previous preferences.</p>
-                <a href="professionals.php" style="display: inline-block; background: #00bfa5; color: white; text-decoration: none; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; margin-right: 10px; cursor: pointer;">Explore Recommendations</a>
+                <a id="exploreRecommendationsLink" href="professionals.php" style="display: inline-block; background: #00bfa5; color: white; text-decoration: none; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; margin-right: 10px; cursor: pointer;">Explore Recommendations</a>
                 <button style="background: transparent; color: white; border: 1px solid #333; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer;" onclick="document.querySelector('.curated-box').style.display='none'">Dismiss</button>
             </div>
             

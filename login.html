@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In - The Serene Finder</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/pages/login.css">
 </head>
 <body class="auth-page">
 
@@ -76,7 +76,11 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(loginData)
                 });
-                
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
                 const result = await response.json();
                 if(result.success) {
                     btn.style.background = "#4caf50";
@@ -87,7 +91,7 @@
                     btn.innerText = "Sign In";
                 }
             } catch (error) {
-                alert("Server error.");
+                alert(`Server error. Make sure PHP backend is running on http://${window.location.hostname}:8000`);
                 btn.innerText = "Sign In";
             }
         });

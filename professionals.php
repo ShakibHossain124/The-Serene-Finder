@@ -4,18 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Explore Professionals - The Serene Finder</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        .explore-layout { display: flex; gap: 30px; max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        .filter-sidebar { flex: 0 0 280px; background: white; padding: 25px; border-radius: 12px; border: 1px solid #e1e8eb; height: fit-content; }
-        .filter-group { margin-bottom: 20px; }
-        .filter-group label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--bg-dark); }
-        .filter-group input[type="text"], .filter-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; }
-        .filter-group input[type="range"] { width: 100%; margin-top: 10px; }
-        .pro-grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; align-content: start; }
-        .pro-card { background: white; border: 1px solid #e1e8eb; border-radius: 12px; padding: 20px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
-        .pro-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); border-color: var(--primary-teal); }
-    </style>
+    <link rel="stylesheet" href="styles/pages/professionals.css">
 </head>
 <body class="light-theme">
 

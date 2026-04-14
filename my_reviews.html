@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Reviews - The Serene Finder</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/pages/my_reviews.css">
 </head>
 <body class="dashboard-body">
 
@@ -71,17 +71,17 @@
                         const priceDisplay = review.total_price ? `$${parseFloat(review.total_price).toFixed(2)}` : '--';
 
                         html += `
-                        <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e1e8eb; margin-bottom: 20px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                <div style="font-weight: 600; color: var(--primary-teal);">${label}</div>
-                                <div style="font-size: 0.85rem; color: var(--text-muted);">${dateString}</div>
+                        <div class="review-item">
+                            <div class="review-item-head">
+                                <div class="review-label">${label}</div>
+                                <div class="review-date">${dateString}</div>
                             </div>
-                            <div style="color: #ffd700; letter-spacing: 2px; font-size: 1.2rem; margin-bottom: 15px;">${stars}</div>
-                            <div style="display: flex; gap: 30px; font-size: 0.85rem; margin-bottom: 15px; padding: 10px; background: #f5f7f8; border-radius: 6px;">
-                                <div><span style="color: #666;">Work Duration:</span> <strong style="color: var(--primary-teal);">${timeDisplay}</strong></div>
-                                <div><span style="color: #666;">Amount:</span> <strong style="color: var(--primary-teal);">${priceDisplay}</strong></div>
+                            <div class="review-stars">${stars}</div>
+                            <div class="review-meta">
+                                <div><span>Work Duration:</span> <strong>${timeDisplay}</strong></div>
+                                <div><span>Amount:</span> <strong>${priceDisplay}</strong></div>
                             </div>
-                            <p style="color: var(--bg-dark); line-height: 1.6; margin: 0;">"${review.comment}"</p>
+                            <p class="review-comment">"${review.comment}"</p>
                         </div>
                         `;
                     });
