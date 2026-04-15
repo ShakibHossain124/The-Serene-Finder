@@ -1,4 +1,5 @@
 <?php
+// Loads editable account/profile fields for the settings page.
 session_start();
 require_once '../db.php';
 header('Content-Type: application/json');
@@ -9,7 +10,6 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 try {
-    // Fetch the user's current profile data
     $stmt = $pdo->prepare("
         SELECT u.full_name, u.email, u.role, p.specialty, p.category, p.hourly_rate, p.bio, p.location 
         FROM users u 

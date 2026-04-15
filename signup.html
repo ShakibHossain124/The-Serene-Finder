@@ -80,7 +80,7 @@
     </div>
 
     <script>
-        // Toggle Logic
+        // Role selector controls which account type is submitted to backend.
         function setRole(role) {
             document.getElementById('selectedRole').value = role;
             document.getElementById('btnCustomer').classList.remove('active');
@@ -93,9 +93,9 @@
             }
         }
 
-        // Form Submission Logic
+        // Registers user after basic client-side password confirmation check.
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevent page reload
+            e.preventDefault();
             
             const btn = document.getElementById('submitBtn');
             const pass = document.getElementById('password').value;
@@ -126,7 +126,6 @@
                 if(result.success) {
                     btn.style.background = "#4caf50";
                     btn.innerText = "✓ Success!";
-                    // Redirect to dashboard after a brief pause
                     setTimeout(() => window.location.href = 'dashboard.html', 1000);
                 } else {
                     alert(result.error);

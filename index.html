@@ -92,32 +92,27 @@
     </div>
 
     <script>
-        // --- GLOBAL AUTH CHECKER ---
-        // This runs automatically on every public page
+        // Landing-page bootstrap: personalize nav for logged-in users and wire home search.
         document.addEventListener("DOMContentLoaded", async () => {
             try {
                 const response = await fetch('api/check_auth.php');
                 const auth = await response.json();
-                
-                // Find the div that holds the "Sign In" button
                 const navActions = document.querySelector('.nav-actions');
                 
                 if (auth.loggedIn && navActions) {
-                    // If logged in, swap the button HTML!
                     navActions.innerHTML = `
                         <a href="dashboard.html" class="btn-primary" style="background: var(--primary-teal); color: white; border: none; margin-right: 10px; text-decoration: none;">Dashboard</a>
                         <button id="globalLogoutBtn" class="btn-primary" style="background: transparent; color: var(--bg-dark); border: 1px solid #ccc;">Log Out</button>
                     `;
-
-                    // Wire up the new Log Out button
                     document.getElementById('globalLogoutBtn').addEventListener('click', async () => {
                         await fetch('api/logout.php');
-                        window.location.reload(); // Refresh the page to show the "Sign In" button again
+                        window.location.reload();
                     });
                 }
 
                 const findExpertBtn = document.getElementById('findExpertBtn');
                 if (findExpertBtn) {
+                    // Build query params from home inputs and send users to filtered directory results.
                     const goToFilteredResults = () => {
                         const searchValue = document.getElementById('homeSearchInput').value.trim();
                         const locationValue = document.getElementById('homeLocationInput').value.trim();

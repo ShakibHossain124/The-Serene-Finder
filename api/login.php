@@ -1,5 +1,6 @@
 <?php
-session_start(); // This is crucial! It starts the memory of the logged-in user
+// Verifies credentials and creates a logged-in session.
+session_start();
 require_once '../db.php';
 header('Content-Type: application/json');
 
@@ -10,14 +11,12 @@ if ($data) {
     $password = $data['password'];
 
     try {
+        // Fetch user record by email and compare submitted password with hash.
         $stmt = $pdo->prepare("SELECT id, full_name, password_hash, role FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
-
-        // Verify the hashed password
         if ($user && password_verify($password, $user['password_hash'])) {
-            
-            // Save their ID and Role into the server's session memory
+            // Persist identity in session for authenticated APIs.
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['role'] = $user['role'];
 

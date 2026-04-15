@@ -143,7 +143,7 @@
         </div>
     </div>
 <script>
-        // Defeat the BFCache: Force a hard reload if the user uses the Back button
+    // Force fresh API data when browser restores page from back-forward cache.
         window.addEventListener("pageshow", function (event) {
             if (event.persisted) {
                 window.location.reload();
@@ -152,6 +152,7 @@
 
         document.addEventListener("DOMContentLoaded", async () => {
             try {
+                // Dashboard payload includes profile info + bookings as customer + jobs as provider.
                 const response = await fetch('api/get_dashboard_data.php');
                 const data = await response.json();
 
@@ -159,16 +160,12 @@
                     window.location.href = 'login.html';
                     return;
                 }
-
-                // Update User Info
                 const fullName = data.user.full_name;
                 const firstName = fullName.split(' ')[0];
                 
                 document.querySelector('.user-info h4').innerText = fullName;
                 document.querySelector('.user-info p').innerText = data.user.role === 'provider' ? 'Service Provider' : 'Premium Member';
                 document.getElementById('welcome-name').innerText = firstName;
-
-                // --- 1. POPULATE TOP WIDGETS ---
                 let allAppointments = [];
                 if (data.my_bookings) {
                     data.my_bookings.forEach(b => allAppointments.push({ ...b, appointmentType: 'booking' }));
@@ -179,8 +176,6 @@
 
                 const now = new Date();
                 const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-                // Only keep upcoming pending/confirmed appointments.
                 let upcomingAppointments = allAppointments.filter(b => {
                     const status = (b.status || '').toLowerCase();
                     if (status === 'cancelled' || status === 'completed') {
@@ -194,47 +189,29 @@
 
                     return apptDate >= startOfToday;
                 });
-
-                // Update the Subtitle count
                 document.getElementById('dash-subtitle').innerText = `Your sanctuary is curated and ready. You have ${upcomingAppointments.length} upcoming appointment(s).`;
-
-                // Find the NEXT upcoming appointment by sorting the dates
                 if (upcomingAppointments.length > 0) {
+                    // Show the nearest upcoming appointment in the top summary card.
                     upcomingAppointments.sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date));
                     const next = upcomingAppointments[0];
                     
                     document.getElementById('next-appt-title').innerText = next.issue_description || 'General Service';
-                    
-                    // Determine if the "other party" is a Provider or a Customer based on appointment type
                     let partyRole = next.appointmentType === 'offer' ? "Customer" : "Provider";
                     document.getElementById('next-appt-pro').innerText = `with ${partyRole}: ${next.other_party}`;
-                    
-                    // Format Date
                     const dateObj = new Date(next.scheduled_date);
                     document.getElementById('next-appt-date').innerText = isNaN(dateObj) ? 'TBD' : dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                    
-                    // Format Status
                     document.getElementById('next-appt-status').innerText = next.status.toUpperCase();
                     document.getElementById('next-appt-status').style.color = next.status === 'confirmed' ? '#4caf50' : '#ffeb3b';
-                    
-                    // Format Duration
                     document.getElementById('next-appt-duration').innerText = next.estimated_time ? `${next.estimated_time} hrs` : '--';
-                    
-                    // Format Cost
                     document.getElementById('next-appt-cost').innerText = next.total_price ? `$${parseFloat(next.total_price).toFixed(2)}` : '--';
                 } else {
-                    // Empty State if they have no bookings
                     document.getElementById('next-appt-title').innerText = "No Upcoming Appointments";
                     document.getElementById('next-appt-pro').innerText = "Explore services to book your first appointment.";
                 }
-
-                // Set Account Status logic
                 document.getElementById('account-role-badge').innerText = data.user.role === 'provider' ? 'Service Provider' : 'Premium Member';
                 document.getElementById('account-health-desc').innerText = data.user.role === 'provider' 
                     ? "Keep your Settings updated to attract more clients to your profile." 
                     : "Your account is active. Discover top-rated professionals today.";
-
-                // --- 2. RENDER DYNAMIC BOOKINGS GRID ---
                 const container = document.getElementById('recentBookingsGrid');
                 container.style.display = 'block'; 
                 container.innerHTML = ''; 
@@ -350,6 +327,7 @@
             window.location.href = 'index.html'; 
         });
 
+        // Provider action handler for accepting or declining pending job offers.
         async function updateBookingStatus(bookingId, newStatus) {
             const action = newStatus === 'confirmed' ? 'accept' : 'decline';
             if (!confirm(`Are you sure you want to ${action} this job?`)) return;
@@ -372,15 +350,13 @@
                 alert("Server error connecting to API.");
             }
         }
-
-        // Open the review modal and secretly store the IDs
+        // Opens modal and stores IDs so the submitted review is linked to the right booking/provider.
         function openReviewModal(bookingId, providerId) {
             document.getElementById('review-booking-id').value = bookingId;
             document.getElementById('review-provider-id').value = providerId;
             document.getElementById('reviewModal').style.display = 'flex';
         }
-
-        // Submit the review to the API
+        // Submits review and relies on backend to mark booking as completed.
         async function submitReview() {
             const btn = document.getElementById('submitReviewBtn');
             btn.innerText = "Submitting...";
@@ -402,7 +378,7 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    window.location.reload(); // Refresh to see the 'Completed' status!
+                    window.location.reload();
                 } else {
                     alert("Error submitting review: " + result.error);
                     btn.innerText = "Submit Review";

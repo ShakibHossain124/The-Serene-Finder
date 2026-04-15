@@ -1,4 +1,5 @@
 <?php
+// Creates a new customer or provider account.
 require_once '../db.php';
 header('Content-Type: application/json');
 
@@ -8,8 +9,9 @@ if ($data) {
     $name = trim($data['full_name'] ?? '');
     $email = trim($data['email'] ?? '');
     $raw_password = $data['password'] ?? '';
-    $password = password_hash($raw_password, PASSWORD_DEFAULT); // Secure hashing
-    $role = $data['role'] ?? ''; // 'customer' or 'provider'
+    // Store only a secure hash, never plain text passwords.
+    $password = password_hash($raw_password, PASSWORD_DEFAULT);
+    $role = $data['role'] ?? '';
 
     if ($name === '' || $email === '' || $raw_password === '' || !in_array($role, ['customer', 'provider'], true)) {
         echo json_encode(['success' => false, 'error' => 'Invalid registration data.']);
@@ -17,20 +19,17 @@ if ($data) {
     }
 
     try {
-        // Check if email exists
+        // Prevent duplicate accounts for the same email.
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
         if ($stmt->fetch()) {
             echo json_encode(['success' => false, 'error' => 'Email already registered.']);
             exit;
         }
-
-        // Insert new user
         $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password_hash, role) VALUES (?, ?, ?, ?)");
         $stmt->execute([$name, $email, $password, $role]);
         $new_user_id = $pdo->lastInsertId();
-
-        // If they are a provider, create a placeholder profile aligned with current schema
+        // Providers get a starter profile row so they can finish setup in settings.
         if ($role === 'provider') {
             $stmt = $pdo->prepare("INSERT INTO provider_profiles (user_id, specialty, hourly_rate, location) VALUES (?, 'Pending Specialty', 0.00, 'Pending Location')");
             $stmt->execute([$new_user_id]);

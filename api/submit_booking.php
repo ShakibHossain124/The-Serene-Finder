@@ -1,9 +1,8 @@
 <?php
+// Creates a booking request from customer to provider.
 session_start();
 require_once '../db.php';
 header('Content-Type: application/json');
-
-// 1. Make sure they are actually logged in!
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'error' => 'You must be logged in to book an appointment.']);
     exit;
@@ -13,7 +12,6 @@ $data = json_decode(file_get_contents('php://input'), true);
 
 if ($data) {
     try {
-        // 2. Use the REAL ID from the current session
         $customer_id = $_SESSION['user_id']; 
         $provider_id = (int)($data['provider_id'] ?? 0);
         $issue = trim($data['issue_description'] ?? '');
@@ -51,6 +49,7 @@ if ($data) {
         ];
 
         if (isset($time_map[$time_window])) {
+            // Convert friendly slot label into actual SQL time value.
             $time_part = $time_map[$time_window];
         } elseif (preg_match('/^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$/', $time_window)) {
             $time_part = strlen($time_window) === 5 ? $time_window . ':00' : $time_window;
@@ -61,8 +60,6 @@ if ($data) {
 
         $scheduled_date = $date_input . ' ' . $time_part;
         $address = $address_line . ', ' . $city . ' ' . $zip;
-
-        // Get provider's hourly rate to calculate total price
         $providerStmt = $pdo->prepare("SELECT hourly_rate FROM provider_profiles WHERE user_id = ?");
         $providerStmt->execute([$provider_id]);
         $provider = $providerStmt->fetch();
@@ -73,6 +70,7 @@ if ($data) {
         
         $hourly_rate = (float)$provider['hourly_rate'];
         $travel_fee = 25.0;
+        // Total price = labor + flat travel fee.
         $total_price = round(($estimated_time * $hourly_rate) + $travel_fee, 2);
 
         $stmt = $pdo->prepare("INSERT INTO bookings (customer_id, provider_id, issue_description, scheduled_date, address, estimated_time, total_price) VALUES (?, ?, ?, ?, ?, ?, ?)");
@@ -80,7 +78,6 @@ if ($data) {
 
         echo json_encode(['success' => true, 'message' => 'Booking confirmed!']);
     } catch (Exception $e) {
-        // 3. Send the exact database error back so we can see what went wrong
         echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
     }
 } else {

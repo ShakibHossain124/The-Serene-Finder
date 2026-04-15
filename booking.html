@@ -136,7 +136,7 @@
     </div>
 
     <script>
-        // --- 1. SCRIPT TO LOAD THE DATA WHEN PAGE OPENS ---
+        // Booking page state: provider rate is loaded once and reused for live total calculation.
         let providerHourlyRate = 0;
         
         document.addEventListener("DOMContentLoaded", async () => {
@@ -149,20 +149,14 @@
                     const provider = await response.json();
 
                     if (!provider.error) {
-                        // Store hourly rate for later calculations
+                        // Pre-fill summary card from provider profile and show default 2-hour estimate.
                         providerHourlyRate = parseFloat(provider.hourly_rate);
-                        
-                        // Inject the data into the HTML IDs we added above
                         document.getElementById('booking-title').innerText = `Schedule your service with ${provider.full_name}`;
                         document.getElementById('summary-name').innerText = provider.full_name;
                         document.getElementById('summary-specialty').innerText = provider.specialty;
                         document.getElementById('summary-rate').innerText = `$${provider.hourly_rate} / hr`;
-                        
-                        // Calculate the initial estimate (2 hours + $25 fee)
                         const estimate = (providerHourlyRate * 2) + 25;
                         document.getElementById('summary-total').innerText = `$${estimate.toFixed(2)}`;
-                        
-                        // Add listener to update summary when estimated time changes
                         document.getElementById('estimatedTime').addEventListener('input', updateSummary);
                     }
                 } catch (error) {
@@ -170,25 +164,19 @@
                 }
             }
         });
-        
-        // Update summary when estimated time changes
+        // Recomputes duration and total whenever estimated hours change.
         function updateSummary() {
             const estimatedTime = document.getElementById('estimatedTime').value;
             if (estimatedTime) {
                 const hours = parseFloat(estimatedTime);
                 document.getElementById('summary-duration').innerText = `${hours} Hour${hours !== 1 ? 's' : ''}`;
-                
-                // Recalculate total
                 const estimate = (providerHourlyRate * hours) + 25;
                 document.getElementById('summary-total').innerText = `$${estimate.toFixed(2)}`;
             }
         }
-
-        // --- 2. SCRIPT TO SAVE THE DATA WHEN SUBMITTED ---
+        // Sends booking payload to backend after collecting all form values.
         async function submitBooking() {
             const btn = document.querySelector('.btn-book');
-            
-            // Read the provider_id directly out of the URL
             const urlParams = new URLSearchParams(window.location.search);
             const dynamicProviderId = urlParams.get('provider_id');
 

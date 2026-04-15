@@ -39,7 +39,7 @@
     </main>
 
     <script>
-        // Defeat BFCache so the archive is always fresh
+        // Ensures archive reflects latest booking states after browser back navigation.
         window.addEventListener("pageshow", function (event) {
             if (event.persisted) {
                 window.location.reload();
@@ -56,7 +56,6 @@
             }
 
             try {
-                // Fetch the exact same data the dashboard uses
                 const response = await fetch('api/get_dashboard_data.php');
                 const data = await response.json();
 
@@ -67,8 +66,7 @@
 
                 const grid = document.getElementById('archiveGrid');
                 let allHistory = [];
-
-                // Combine Outbound Bookings (Services I bought)
+                // Merge both booking directions into one historical timeline.
                 if (data.my_bookings) {
                     data.my_bookings.forEach(b => {
                         b.type = "Purchased Service";
@@ -77,8 +75,6 @@
                         allHistory.push(b);
                     });
                 }
-
-                // Combine Inbound Jobs (Services I provided)
                 if (data.job_offers) {
                     data.job_offers.forEach(b => {
                         b.type = "Job Offer";
@@ -87,16 +83,12 @@
                         allHistory.push(b);
                     });
                 }
-
-                // Sort everything by date (Newest first)
                 allHistory.sort((a, b) => new Date(b.scheduled_date) - new Date(a.scheduled_date));
 
                 if (allHistory.length === 0) {
                     grid.innerHTML = `<p style="color: #8b9598;">No booking history found.</p>`;
                     return;
                 }
-
-                // Generate the HTML for every single item in their history
                 let html = '';
                 allHistory.forEach(booking => {
                     let statusClass = booking.status === 'confirmed' ? 'status-confirmed' : (booking.status === 'cancelled' ? 'status-cancelled' : 'status-pending');

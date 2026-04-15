@@ -88,7 +88,7 @@
     </main>
 
     <script>
-        // 1. Load the existing data when the page opens
+        // Loads saved profile data and toggles role-specific fields.
         document.addEventListener("DOMContentLoaded", async () => {
             try {
                 const response = await fetch('api/get_settings.php');
@@ -96,8 +96,6 @@
 
                 if (data.success && data.profile) {
                     const isProvider = data.profile.role === 'provider';
-
-                    // Pre-fill the form inputs
                     document.getElementById('full_name').value = data.profile.full_name || '';
                     document.getElementById('email').value = data.profile.email || '';
                     document.getElementById('specialty').value = data.profile.specialty || '';
@@ -128,7 +126,7 @@
             }
         });
 
-        // 2. Save the new data when the form is submitted
+        // Submits editable fields and shows transient success/failure button state.
         document.getElementById('settingsForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveBtn');

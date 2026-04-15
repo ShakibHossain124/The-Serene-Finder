@@ -1,4 +1,5 @@
 <?php
+// Saves account/profile settings for the signed-in user.
 session_start();
 require_once '../db.php';
 header('Content-Type: application/json');
@@ -19,12 +20,9 @@ if ($data) {
             echo json_encode(['success' => false, 'error' => 'Full name is required.']);
             exit;
         }
-
-        // Always allow account name updates for both customer and provider
         $userStmt = $pdo->prepare("UPDATE users SET full_name = ? WHERE id = ?");
         $userStmt->execute([$fullName, $userId]);
-
-        // Determine current role from database, not from client payload
+        // Role is read from DB so client payload cannot spoof provider/customer privileges.
         $roleStmt = $pdo->prepare("SELECT role FROM users WHERE id = ?");
         $roleStmt->execute([$userId]);
         $role = $roleStmt->fetchColumn();
@@ -40,8 +38,7 @@ if ($data) {
                 echo json_encode(['success' => false, 'error' => 'Please fill all provider profile fields.']);
                 exit;
             }
-
-            // Insert-or-update provider profile to avoid failing when row does not exist yet
+            // Upsert ensures first-time providers and existing providers both succeed.
             $providerStmt = $pdo->prepare(" 
                 INSERT INTO provider_profiles (user_id, specialty, category, hourly_rate, bio, location)
                 VALUES (?, ?, ?, ?, ?, ?)

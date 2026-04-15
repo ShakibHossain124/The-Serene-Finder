@@ -77,7 +77,7 @@
     </div>
 
     <script>
-        // --- GLOBAL AUTH CHECKER ---
+        // Keeps navbar actions in sync with current login state.
         async function runAuthCheck() {
             try {
                 const response = await fetch('api/check_auth.php');
@@ -104,21 +104,15 @@
         document.getElementById('locationFilter').value = urlParams.get('location') || '';
         document.getElementById('categoryFilter').value = urlParams.get('category') || '';
 
-        // --- SEARCH ENGINE LOGIC ---
+        // Reads active filters, queries API, and renders provider cards.
         async function loadProfessionals() {
             const grid = document.getElementById('providersGrid');
             grid.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1; text-align: center;">Searching...</p>';
-
-            // Grab the values from the sidebar
             const search = document.getElementById('searchInput').value;
             const category = document.getElementById('categoryFilter').value;
             const location = document.getElementById('locationFilter').value;
             const maxPrice = document.getElementById('priceFilter').value;
-
-            // Update the visual price label
             document.getElementById('priceLabel').innerText = `$${maxPrice}`;
-
-            // Build the dynamic URL
             const url = `api/search_providers.php?search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}&location=${encodeURIComponent(location)}&max_price=${maxPrice}`;
 
             try {
@@ -128,7 +122,7 @@
                 if (data.success && data.providers.length > 0) {
                     let html = '';
                     data.providers.forEach(p => {
-                        // Math for Stars
+                        // Build 5-star visual by rounding average rating.
                         const rating = parseFloat(p.rating || 0);
                         const stars = '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating));
                         const initial = p.full_name.charAt(0).toUpperCase();
@@ -165,15 +159,8 @@
                 grid.innerHTML = `<p style="color: red; grid-column: 1/-1;">Error connecting to database.</p>`;
             }
         }
-
-        // --- EVENT LISTENERS ---
-        // Run search immediately when the page loads
         document.addEventListener('DOMContentLoaded', loadProfessionals);
-        
-        // Run search when the big button is clicked
         document.getElementById('searchBtn').addEventListener('click', loadProfessionals);
-        
-        // Run search when user presses 'Enter' in the text box
         document.getElementById('searchInput').addEventListener('keyup', (e) => {
             if (e.key === 'Enter') loadProfessionals();
         });
@@ -181,14 +168,8 @@
         document.getElementById('locationFilter').addEventListener('keyup', (e) => {
             if (e.key === 'Enter') loadProfessionals();
         });
-
-        // Run search instantly when the slider is dragged
         document.getElementById('priceFilter').addEventListener('input', loadProfessionals);
-        
-        // Run search instantly when a category is picked
         document.getElementById('categoryFilter').addEventListener('change', loadProfessionals);
-
-        // Run search when location text changes
         document.getElementById('locationFilter').addEventListener('change', loadProfessionals);
 
     </script>

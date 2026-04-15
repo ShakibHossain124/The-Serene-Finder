@@ -1,6 +1,7 @@
 <?php
+// Clears all session data to sign the user out.
 session_start();
-session_unset();    // Remove all session variables
-session_destroy();  // Destroy the session completely
+session_unset();
+session_destroy();
 echo json_encode(['success' => true]);
 ?>

@@ -1,8 +1,9 @@
 <?php
+// Central PDO connection used by all API endpoints.
 $host = 'localhost';
 $db   = 'serene_finder';
-$user = 'root'; // Replace with your DB username
-$pass = '';     // Replace with your DB password
+$user = 'root';
+$pass = '';
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
@@ -13,6 +14,7 @@ $options = [
 ];
 
 try {
+    // Create one configured PDO instance with exceptions and safe prepared statements.
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
     throw new \PDOException($e->getMessage(), (int)$e->getCode());

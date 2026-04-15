@@ -84,7 +84,7 @@
     </div>
 
     <script>
-        // --- 1. GLOBAL AUTH CHECKER ---
+        // Updates nav actions based on authentication state.
         async function runAuthCheck() {
             try {
                 const response = await fetch('api/check_auth.php');
@@ -105,7 +105,7 @@
         }
         window.addEventListener("pageshow", (event) => { runAuthCheck(); });
 
-        // --- 2. LOAD PROFILE & REVIEWS ---
+        // Loads one provider profile and renders details + recent reviews.
         document.addEventListener("DOMContentLoaded", async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const providerId = urlParams.get('id');
@@ -128,8 +128,6 @@
                 }
 
                 const firstName = provider.full_name.split(' ')[0];
-                
-                // Inject Top Profile Data
                 document.getElementById('profile-name').innerText = provider.full_name;
                 document.getElementById('bio-name').innerText = firstName;
                 document.getElementById('profile-specialty').innerText = provider.specialty;
@@ -140,11 +138,10 @@
                 document.getElementById('profile-bio-text').innerText = provider.bio || "This professional hasn't added a biography yet.";
                 document.getElementById('contact-btn').innerHTML = `💬 Contact ${firstName}`;
 
+                // Redirect book action to booking page while preserving selected provider ID.
                 bookButton.onclick = function() {
                     window.location.href = `booking.html?provider_id=${providerId}`;
                 };
-
-                // --- NEW: RENDER THE DYNAMIC REVIEWS ---
                 const reviewsContainer = document.querySelector('.reviews-section');
                 let reviewsHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -153,11 +150,9 @@
                 `;
 
                 if (provider.recent_reviews && provider.recent_reviews.length > 0) {
+                    // Convert each review into a card with date and star display.
                     provider.recent_reviews.forEach(review => {
-                        // Format the date
                         const dateString = new Date(review.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                        
-                        // Generate the Star string (e.g. 4 becomes ★★★★☆)
                         const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
                         const initial = review.reviewer_name.charAt(0).toUpperCase();
 
